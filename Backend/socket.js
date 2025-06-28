@@ -36,8 +36,8 @@ function initializeSocket(server) {
 
             await captainModel.findByIdAndUpdate(userId, {
                 location: {
-                    ltd: location.ltd,
-                    lng: location.lng
+                    type: 'Point',
+                    coordinates: [location.lng, location.ltd] // Fix: GeoJSON format [lng, lat]
                 }
             });
         });
