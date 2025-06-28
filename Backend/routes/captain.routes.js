@@ -37,4 +37,7 @@ router.get('/stats', authCaptain, captainController.getCaptainStats);
 router.patch('/go-online', authCaptain, captainController.goOnline);
 router.patch('/go-offline', authCaptain, captainController.goOffline);
 
+// Add this temporary route for testing
+router.patch('/make-all-active', captainController.makeAllCaptainsActive);
+
 module.exports = router;

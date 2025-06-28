@@ -276,3 +276,27 @@ module.exports.goOffline = async (req, res, next) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+// Add this temporary endpoint to make all captains active for testing
+
+module.exports.makeAllCaptainsActive = async (req, res, next) => {
+    try {
+        // Update all captains to be active and set their location near Islamabad
+        const result = await captainModel.updateMany(
+            {},
+            {
+                status: 'active',
+                location: {
+                    type: 'Point',
+                    coordinates: [73.0479, 33.6844] // [lng, lat] format for GeoJSON
+                }
+            }
+        );
+        
+        console.log(`Updated ${result.modifiedCount} captains to active`);
+        res.status(200).json({ message: `Updated ${result.modifiedCount} captains to active` });
+    } catch (error) {
+        console.error('Error updating captains:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
