@@ -54,24 +54,22 @@ function getOtp(num) {
 }
 
 
-module.exports.createRide = async ({
-    user, pickup, destination, vehicleType
-}) => {
+module.exports.createRide = async ({ user, pickup, destination, vehicleType }) => {
     if (!user || !pickup || !destination || !vehicleType) {
         throw new Error('All fields are required');
     }
 
-    const fare = await getFare(pickup, destination);
+    // Generate 4-digit OTP
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-
-
-    const ride = rideModel.create({
+    const ride = await rideModel.create({
         user,
         pickup,
         destination,
-        otp: getOtp(6),
-        fare: fare[ vehicleType ]
-    })
+        vehicleType,
+        otp, // Make sure OTP is included
+        status: 'pending'
+    });
 
     return ride;
 }

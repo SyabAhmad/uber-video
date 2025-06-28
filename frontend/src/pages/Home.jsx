@@ -42,8 +42,11 @@ const Home = () => {
     const { user } = useContext(UserDataContext)
 
     useEffect(() => {
-        socket.emit("join", { userType: "user", userId: user._id })
-    }, [ user ])
+        // Add this check to prevent the error
+        if (user && user._id) {
+            socket.emit("join", { userType: "user", userId: user._id })
+        }
+    }, [ user ]) // Changed dependency from [user] to watch for user changes
 
     socket.on('ride-confirmed', ride => {
 
@@ -185,17 +188,31 @@ const Home = () => {
     }
 
     async function createRide() {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            console.error('No token found');
+            return;
+        }
+
+        console.log('Creating ride with token:', token); // Debug log
+        console.log('Pickup:', pickup, 'Destination:', destination, 'Vehicle:', vehicleType); // Debug log
+
         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
             pickup,
             destination,
             vehicleType
         }, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
+                Authorization: `Bearer ${token}`
             }
         })
 
 
+        setRide(response.data)
+        setVehiclePanel(false)
+        setConfirmRidePanel(false)
+        setVehicleFound(true)
     }
 
     return (
@@ -282,12 +299,10 @@ const Home = () => {
                     vehicleType={vehicleType}
                     setVehicleFound={setVehicleFound} />
             </div>
-            <div ref={waitingForDriverRef} className='fixed w-full  z-10 bottom-0  bg-white px-3 py-6 pt-12'>
+            <div ref={waitingForDriverRef} className='fixed w-full z-10 bottom-0 bg-white px-3 py-6 pt-12'>
                 <WaitingForDriver
                     ride={ride}
-                    setVehicleFound={setVehicleFound}
-                    setWaitingForDriver={setWaitingForDriver}
-                    waitingForDriver={waitingForDriver} />
+                />
             </div>
         </div>
     )

@@ -13,6 +13,14 @@ module.exports.createRide = async (req, res) => {
 
     const { pickup, destination, vehicleType } = req.body;
 
+    console.log('Creating ride with user:', req.user); // Debug log
+    console.log('Request body:', req.body); // Debug log
+
+    // Add this check to prevent the error
+    if (!req.user || !req.user._id) {
+        return res.status(401).json({ message: 'User not authenticated' });
+    }
+
     try {
         const ride = await rideService.createRide({ 
             user: req.user._id, 
@@ -25,7 +33,7 @@ module.exports.createRide = async (req, res) => {
 
         const pickupCoordinates = await mapService.getAddressCoordinate(pickup);
 
-        console.log('Pickup coordinates:', pickupCoordinates); // Debug log
+        console.log('Pickup coordinates:', pickupCoordinates);
 
         const captainsInRadius = await mapService.getCaptainsInTheRadius(
             pickupCoordinates.ltd, 
@@ -33,14 +41,14 @@ module.exports.createRide = async (req, res) => {
             2
         );
 
-        console.log('Captains in radius:', captainsInRadius.length); // Debug log
+        console.log('Captains in radius:', captainsInRadius.length);
 
         ride.otp = "";
 
         const rideWithUser = await rideModel.findOne({ _id: ride._id }).populate('user');
 
         captainsInRadius.map(captain => {
-            console.log(`Sending ride to captain ${captain._id} with socketId: ${captain.socketId}`); // Debug log
+            console.log(`Sending ride to captain ${captain._id} with socketId: ${captain.socketId}`);
             
             sendMessageToSocketId(captain.socketId, {
                 event: 'new-ride',
@@ -49,7 +57,7 @@ module.exports.createRide = async (req, res) => {
         });
 
     } catch (err) {
-        console.log(err);
+        console.log('Create ride error:', err);
         return res.status(500).json({ message: err.message });
     }
 };
