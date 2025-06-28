@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { body } = require("express-validator")
 const authMiddleware = require('../middlewares/auth.middleware');
+const { authCaptain } = require('../middlewares/auth.middleware');
 
 
 router.post('/register', [
@@ -29,6 +30,9 @@ router.post('/login', [
 router.get('/profile', authMiddleware.authCaptain, captainController.getCaptainProfile)
 
 router.get('/logout', authMiddleware.authCaptain, captainController.logoutCaptain)
+
+// Add this route
+router.get('/stats', authCaptain, captainController.getCaptainStats);
 
 
 module.exports = router;

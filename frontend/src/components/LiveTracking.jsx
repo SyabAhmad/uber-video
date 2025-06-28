@@ -17,6 +17,7 @@ const LiveTracking = () => {
     useEffect(() => {
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
+            console.log('Initial position:', latitude, longitude);
             setCurrentPosition({
                 lat: latitude,
                 lng: longitude
@@ -25,6 +26,7 @@ const LiveTracking = () => {
 
         const watchId = navigator.geolocation.watchPosition((position) => {
             const { latitude, longitude } = position.coords;
+            console.log('Position updated:', latitude, longitude);
             setCurrentPosition({
                 lat: latitude,
                 lng: longitude
@@ -32,25 +34,6 @@ const LiveTracking = () => {
         });
 
         return () => navigator.geolocation.clearWatch(watchId);
-    }, []);
-
-    useEffect(() => {
-        const updatePosition = () => {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const { latitude, longitude } = position.coords;
-
-                console.log('Position updated:', latitude, longitude);
-                setCurrentPosition({
-                    lat: latitude,
-                    lng: longitude
-                });
-            });
-        };
-
-        updatePosition(); // Initial position update
-
-        const intervalId = setInterval(updatePosition, 1000); // Update every 10 seconds
-
     }, []);
 
     return (

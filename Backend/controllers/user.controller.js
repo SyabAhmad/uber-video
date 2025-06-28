@@ -37,23 +37,25 @@ module.exports.registerUser = async (req, res, next) => {
 }
 
 module.exports.loginUser = async (req, res, next) => {
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
     const { email, password } = req.body;
+    console.log('Login attempt for email:', email); // Add this line
 
     const user = await userModel.findOne({ email }).select('+password');
 
     if (!user) {
+        console.log('User not found for email:', email); // Add this line
         return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
+        console.log('Password mismatch for email:', email); // Add this line
         return res.status(401).json({ message: 'Invalid email or password' });
     }
 

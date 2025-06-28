@@ -29,14 +29,7 @@ const captainSchema = new mongoose.Schema({
     socketId: {
         type: String,
     },
-
-    status: {
-        type: String,
-        enum: [ 'active', 'inactive' ],
-        default: 'inactive',
-    },
-
-    vehicle: {
+    vehicle: { // Add this vehicle schema
         color: {
             type: String,
             required: true,
@@ -58,16 +51,26 @@ const captainSchema = new mongoose.Schema({
             enum: [ 'car', 'motorcycle', 'auto' ],
         }
     },
-
     location: {
-        ltd: {
-            type: Number,
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
         },
-        lng: {
-            type: Number,
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            default: [0, 0]
         }
+    },
+    status: {
+        type: String,
+        enum: ['active', 'inactive', 'busy'],
+        default: 'inactive'
     }
-})
+});
+
+// Add geospatial index for location queries
+captainSchema.index({ location: '2dsphere' });
 
 
 captainSchema.methods.generateAuthToken = function () {

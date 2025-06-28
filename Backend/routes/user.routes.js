@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { body } = require("express-validator")
 const userController = require('../controllers/user.controller');
-const authMiddleware = require('../middlewares/auth.middleware');
+const captainController = require('../controllers/captain.controller');
+const { authUser } = require('../middlewares/auth.middleware'); // Add this import
 
 
 router.post('/register', [
@@ -20,10 +21,11 @@ router.post('/login', [
     userController.loginUser
 )
 
-router.get('/profile', authMiddleware.authUser, userController.getUserProfile)
+router.get('/profile', authUser, userController.getUserProfile)
+router.get('/logout', authUser, userController.logoutUser)
 
-router.get('/logout', authMiddleware.authUser, userController.logoutUser)
-
+// Add this route
+router.get('/nearby-vehicles', authUser, captainController.getNearbyVehicles);
 
 
 module.exports = router;
