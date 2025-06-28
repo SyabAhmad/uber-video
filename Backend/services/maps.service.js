@@ -126,3 +126,17 @@ module.exports.getCaptainsInTheRadius = async (ltd, lng, radius) => {
     console.log(`Found ${captains.length} active captains in radius`); // Debug log
     return captains;
 };
+
+module.exports.getFare = async (pickup, destination, vehicleType) => {
+    // Dummy fallback logic for fare calculation
+    // Replace with your real logic or API call
+    return 100 + Math.floor(Math.random() * 100);
+};
+
+module.exports = {
+    getAutoCompleteSuggestions: module.exports.getAutoCompleteSuggestions,
+    getDistanceTime: module.exports.getDistanceTime,
+    getAddressCoordinate: module.exports.getAddressCoordinate,
+    getCaptainsInTheRadius: module.exports.getCaptainsInTheRadius,
+    getFare: module.exports.getFare
+};

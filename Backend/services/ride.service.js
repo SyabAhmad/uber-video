@@ -55,19 +55,18 @@ function getOtp(num) {
 
 
 module.exports.createRide = async ({ user, pickup, destination, vehicleType }) => {
-    if (!user || !pickup || !destination || !vehicleType) {
-        throw new Error('All fields are required');
-    }
+    // Calculate fare using your fare calculation logic or API
+    const fare = await mapService.getFare(pickup, destination, vehicleType);
 
-    // Generate 4-digit OTP
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    // If fareData is an object, extract the value you need
+    const fareValue = fare?.fare || fare;
 
     const ride = await rideModel.create({
         user,
         pickup,
         destination,
         vehicleType,
-        otp, // Make sure OTP is included
+        fare: fareValue, // <-- Add this line
         status: 'pending'
     });
 
