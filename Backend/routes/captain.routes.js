@@ -34,5 +34,7 @@ router.get('/logout', authMiddleware.authCaptain, captainController.logoutCaptai
 // Add this route
 router.get('/stats', authCaptain, captainController.getCaptainStats);
 
+router.patch('/go-online', authCaptain, captainController.goOnline);
+router.patch('/go-offline', authCaptain, captainController.goOffline);
 
 module.exports = router;

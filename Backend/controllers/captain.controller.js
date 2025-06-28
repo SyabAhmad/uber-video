@@ -235,3 +235,44 @@ module.exports.updateCaptainStatus = async (req, res, next) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+module.exports.goOnline = async (req, res, next) => {
+    try {
+        const { lat, lng } = req.body;
+        const captainId = req.captain._id;
+        
+        const captain = await captainModel.findByIdAndUpdate(
+            captainId,
+            {
+                status: 'active',
+                location: {
+                    type: 'Point',
+                    coordinates: [parseFloat(lng), parseFloat(lat)]
+                }
+            },
+            { new: true }
+        );
+        
+        res.status(200).json(captain);
+    } catch (error) {
+        console.error('Error updating captain status:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+module.exports.goOffline = async (req, res, next) => {
+    try {
+        const captainId = req.captain._id;
+        
+        const captain = await captainModel.findByIdAndUpdate(
+            captainId,
+            { status: 'inactive' },
+            { new: true }
+        );
+        
+        res.status(200).json(captain);
+    } catch (error) {
+        console.error('Error updating captain status:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};

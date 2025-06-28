@@ -34,6 +34,7 @@ const Home = () => {
     const [ fare, setFare ] = useState({})
     const [ vehicleType, setVehicleType ] = useState(null)
     const [ ride, setRide ] = useState(null)
+    const [ paymentMethod, setPaymentMethod ] = useState('cash')
 
     const navigate = useNavigate()
 
@@ -262,13 +263,15 @@ const Home = () => {
             </div>
             <div ref={confirmRidePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12'>
                 <ConfirmRide
-                    createRide={createRide}
                     pickup={pickup}
                     destination={destination}
+                    paymentMethod={paymentMethod}
                     fare={fare}
                     vehicleType={vehicleType}
-
-                    setConfirmRidePanel={setConfirmRidePanel} setVehicleFound={setVehicleFound} />
+                    setConfirmRidePanel={setConfirmRidePanel}
+                    setVehicleFound={setVehicleFound}
+                    createRide={createRide}
+                />
             </div>
             <div ref={vehicleFoundRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12'>
                 <LookingForDriver

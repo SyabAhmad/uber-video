@@ -27,17 +27,34 @@ const CaptainHome = () => {
             userId: captain._id,
             userType: 'captain'
         })
+        
         const updateLocation = () => {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(position => {
-
+                navigator.geolocation.getCurrentPosition(async position => {
+                    const locationData = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    
+                    // Update location in socket
                     socket.emit('update-location-captain', {
                         userId: captain._id,
                         location: {
                             ltd: position.coords.latitude,
                             lng: position.coords.longitude
                         }
-                    })
+                    });
+                    
+                    // Also update captain status to online and location in database
+                    try {
+                        await axios.patch(`${import.meta.env.VITE_BASE_URL}/captains/go-online`, locationData, {
+                            headers: {
+                                Authorization: `Bearer ${localStorage.getItem('token')}`
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error updating captain location:', error);
+                    }
                 })
             }
         }
@@ -45,8 +62,8 @@ const CaptainHome = () => {
         const locationInterval = setInterval(updateLocation, 10000)
         updateLocation()
 
-        // return () => clearInterval(locationInterval)
-    }, [])
+        return () => clearInterval(locationInterval)
+    }, [captain])
 
     socket.on('new-ride', (data) => {
 
@@ -103,31 +120,49 @@ const CaptainHome = () => {
         <div className='h-screen'>
             <div className='fixed p-6 top-0 flex items-center justify-between w-screen'>
                 <img className='w-16' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="" />
+                <div className='flex gap-2'>
+                    <button 
+                        onClick={async () => {
+                            try {
+                                await axios.patch(`${import.meta.env.VITE_BASE_URL}/captains/go-offline`, {}, {
+                                    headers: {
+                                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                                    }
+                            });
+                        } catch (error) {
+                            console.error('Error going offline:', error);
+                        }
+                    }}
+                    className='h-10 w-20 bg-red-500 text-white text-sm flex items-center justify-center rounded-full'
+                >
+                    Offline
+                </button>
                 <Link to='/captain-home' className=' h-10 w-10 bg-white flex items-center justify-center rounded-full'>
                     <i className="text-lg font-medium ri-logout-box-r-line"></i>
                 </Link>
             </div>
-            <div className='h-3/5'>
-                <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
-
-            </div>
-            <div className='h-2/5 p-6'>
-                <CaptainDetails />
-            </div>
-            <div ref={ridePopupPanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12'>
-                <RidePopUp
-                    ride={ride}
-                    setRidePopupPanel={setRidePopupPanel}
-                    setConfirmRidePopupPanel={setConfirmRidePopupPanel}
-                    confirmRide={confirmRide}
-                />
-            </div>
-            <div ref={confirmRidePopupPanelRef} className='fixed w-full h-screen z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12'>
-                <ConfirmRidePopUp
-                    ride={ride}
-                    setConfirmRidePopupPanel={setConfirmRidePopupPanel} setRidePopupPanel={setRidePopupPanel} />
-            </div>
         </div>
+        <div className='h-3/5'>
+            <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
+
+        </div>
+        <div className='h-2/5 p-6'>
+            <CaptainDetails />
+        </div>
+        <div ref={ridePopupPanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12'>
+            <RidePopUp
+                ride={ride}
+                setRidePopupPanel={setRidePopupPanel}
+                setConfirmRidePopupPanel={setConfirmRidePopupPanel}
+                confirmRide={confirmRide}
+            />
+        </div>
+        <div ref={confirmRidePopupPanelRef} className='fixed w-full h-screen z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12'>
+            <ConfirmRidePopUp
+                ride={ride}
+                setConfirmRidePopupPanel={setConfirmRidePopupPanel} setRidePopupPanel={setRidePopupPanel} />
+        </div>
+    </div>
     )
 }
 
